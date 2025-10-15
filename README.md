@@ -190,5 +190,261 @@ Here are the most common ones:
 
 > A **deployment pipeline** automates every step from code commit to production release — combining build, test, and deployment stages — while **deployment strategies** determine *how* updates reach users (gradually, instantly, or safely).
 
+<img width="914" height="416" alt="image" src="https://github.com/user-attachments/assets/d10714aa-46a9-486a-8c63-dd9ad8d39ae7" />
 
 ---
+
+LESSON TWO
+
+# 🚀 **Automated Releases and Versioning**
+
+---
+
+# ⚙️ **Automatic Versioning in CI/CD**
+
+### 🧭 What It Is
+
+**Automatic versioning** means your CI/CD pipeline automatically **updates the version number** of your application (e.g., `1.0.0 → 1.0.1`) whenever new code changes are merged or deployed — **without manual edits**.
+
+This helps maintain a **consistent, traceable release history** and supports automated publishing or deployments.
+
+---
+
+## 🧩 **Why It’s Useful**
+
+* Keeps versioning **consistent** across developers.
+* Reduces human error (no forgotten version bumps).
+* Enables **automated releases** (e.g., tagging builds or publishing to npm, Docker Hub, PyPI, etc.).
+* Links code changes directly to **semantic versions** for clear changelogs.
+
+---
+
+## 🧠 **How It Works**
+
+Automatic versioning is often driven by:
+
+1. **Commit messages**, or
+2. **Pull request metadata**, or
+3. **Git tags** automatically created by the CI/CD workflow.
+
+---
+
+## 🔢 **Semantic Versioning (SemVer)**
+
+Most pipelines follow the **Semantic Versioning** format:
+
+```
+MAJOR.MINOR.PATCH
+```
+
+| Type of Change | Example       | Trigger                           |
+| -------------- | ------------- | --------------------------------- |
+| **MAJOR**      | 1.0.0 → 2.0.0 | Breaking changes                  |
+| **MINOR**      | 1.0.0 → 1.1.0 | New features (no breaking change) |
+| **PATCH**      | 1.0.0 → 1.0.1 | Bug fixes or small updates        |
+
+---
+
+## ⚡ **How CI/CD Automates It**
+
+### Example Tools:
+
+* **semantic-release** (Node.js)
+* **standard-version**
+* **GitVersion** (.NET)
+* **bump2version** (Python)
+* **npm version** (for JS projects)
+
+---
+
+### Example: GitHub Actions + semantic-release
+
+```yaml
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run semantic release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+```
+
+**semantic-release**:
+
+* Reads commit messages (e.g., `fix:`, `feat:`, `BREAKING CHANGE:`)
+* Calculates new version automatically
+* Creates a new **Git tag** (e.g., `v1.2.0`)
+* Generates a **changelog**
+* Publishes to npm or GitHub Releases
+
+---
+
+### Example Commit Message Triggers:
+
+| Commit message               | Result                     |
+| ---------------------------- | -------------------------- |
+| `fix: corrected login error` | Patch bump (1.0.0 → 1.0.1) |
+| `feat: added user profile`   | Minor bump (1.0.1 → 1.1.0) |
+| `feat!: changed API schema`  | Major bump (1.1.0 → 2.0.0) |
+
+---
+
+## ✅ **Summary**
+
+Automatic versioning in CI/CD:
+
+* Uses **commit history** to infer code change types.
+* **Increments version numbers** automatically (SemVer rules).
+* **Tags releases** and updates changelogs or package manifests.
+* Keeps the release process **consistent, fast, and auditable**.
+
+----------------------
+
+### Example: GitHub Actions + automated versioning
+Images below show the workflow breakdown
+<img width="943" height="434" alt="image" src="https://github.com/user-attachments/assets/a0d7e0e5-c36d-43d1-88f2-e95597592662" />
+Defines one job named "Create Tag", running on a Linux runner (Ubuntu).
+
+<img width="953" height="424" alt="image" src="https://github.com/user-attachments/assets/83a0167f-96e9-43c3-8298-2aea045efaa9" />
+This is the key action:
+It reads your latest tag (e.g., v1.0.0)
+Then automatically increments the version (v1.0.1 if patch bump)
+Then creates a new Git tag and pushes it back to the repo.
+DEFAULT_BUMP decides what to bump:
+patch → 1.0.0 → 1.0.1
+minor → 1.0.0 → 1.1.0
+major → 1.0.0 → 2.0.0
+
+
+```yaml
+name: Bump version and tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Create Tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # The checkout action checks out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
+
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.26.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+        # This action automatically increments the patch version and tags the commit.
+        # 'DEFAULT_BUMP' specifies the type of version bump (major, minor, patch).
+
+```
+
+To create a new release upon events like a new tagging, the release code on workflow would look like this 
+```
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # Checks out the code in the tag that triggered the workflow.
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{" secrets.GITHUB_TOKEN "}}
+        with:
+          tag_name: ${{" github.ref "}}
+          release_name: Release ${{" github.ref "}}
+          # This step creates a new release in GitHub using the tag name.
+```
+
+------
+
+
+LESSON THREE
+Deploying to cloud platforms
+
+1. <img width="413" height="251" alt="image" src="https://github.com/user-attachments/assets/d8d2cb08-326a-4105-a94b-b830d151ac96" />
+2. <img width="417" height="266" alt="image" src="https://github.com/user-attachments/assets/47084a83-c932-45d0-afb4-bacef9dfaca7" />
+   <img width="905" height="391" alt="image" src="https://github.com/user-attachments/assets/d5bdd5bc-0b80-4821-a04f-f8e6a1c43bbe" />
+   <img width="647" height="394" alt="image" src="https://github.com/user-attachments/assets/9a91051c-3233-412a-bf6c-a30326eb8d3d" />
+
+
+
+```
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+  # This workflow triggers on a push to the 'main' branch.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Specifies the runner environment.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # Checks out your repository under $GITHUB_WORKSPACE.
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+        # Configures AWS credentials from GitHub secrets.
+
+      - name: Deploy to AWS
+        run: |
+          # Add your deployment script here.
+          # For example, using AWS CLI commands to deploy.
+```
+✅ Save as: .github/workflows/deploy.yml
+
+You’ll also need to set up your AWS credentials in your GitHub repository:
+
+Go to Settings → Secrets and variables → Actions → New repository secret
+and add:
+
+AWS_ACCESS_KEY_ID
+
+AWS_SECRET_ACCESS_KEY
+
+Then, this workflow will run automatically on every push to the main branch and execute your AWS deployment commands.
+
+
+
+
+
