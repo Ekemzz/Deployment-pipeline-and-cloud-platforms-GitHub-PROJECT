@@ -442,7 +442,14 @@ AWS_ACCESS_KEY_ID
 
 AWS_SECRET_ACCESS_KEY
 
-Then, this workflow will run automatically on every push to the main branch and execute your AWS deployment commands.
+Then, this workflow will run automatically on every push to the main branch and execute your AWS deployment commands. See images below for demo
+
+i. <img width="947" height="437" alt="image" src="https://github.com/user-attachments/assets/75277032-7db8-47bc-b25d-4c86b9896685" />
+ii. <img width="954" height="434" alt="image" src="https://github.com/user-attachments/assets/5d04987d-75c3-4cf1-989e-adeb909ab4e8" />
+iii. <img width="949" height="440" alt="image" src="https://github.com/user-attachments/assets/375f4165-76b7-4b97-9a37-7b5bedd1ffd2" />
+iv. <img width="890" height="392" alt="image" src="https://github.com/user-attachments/assets/7a11f71a-20d8-4de6-8f80-90b88cc20272" />
+v. <img width="953" height="485" alt="image" src="https://github.com/user-attachments/assets/bccce56e-a2a9-4a07-8d44-96b9045c5190" />
+
 
 
 
